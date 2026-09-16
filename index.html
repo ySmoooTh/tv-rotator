@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>TV Dashboard</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #000;
+        }
+
+        #pagina {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        #contador {
+            position: fixed;
+            right: 15px;
+            bottom: 15px;
+
+            background: rgba(0, 0, 0, 0.65);
+            color: white;
+
+            padding: 8px 12px;
+
+            border-radius: 6px;
+
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+
+            z-index: 9999;
+        }
+    </style>
+</head>
+
+<body>
+
+    <iframe
+        id="pagina"
+        allow="autoplay; fullscreen"
+        allowfullscreen>
+    </iframe>
+
+    <div id="contador">
+        Carregando...
+    </div>
+
+    <script>
+
+        const paginas = [
+            {
+                nome: "YouTube",
+                url: "https://www.youtube.com/",
+                tempo: 40000
+            },
+            {
+                nome: "iFractal",
+                url: "https://awstou.ifractal.com.br/barbi/login.php",
+                tempo: 40000
+            },
+            {
+                nome: "Barbi",
+                url: "https://www.barbidobrasil.com.br/",
+                tempo: 40000
+            }
+        ];
+
+        let indice = 0;
+        let tempoRestante = 40;
+        let intervalo;
+
+        const iframe = document.getElementById("pagina");
+        const contador = document.getElementById("contador");
+
+
+        function carregarPagina() {
+
+            const pagina = paginas[indice];
+
+            console.log("Abrindo:", pagina.nome);
+
+            iframe.src = pagina.url;
+
+            tempoRestante = Math.ceil(pagina.tempo / 1000);
+
+            atualizarContador();
+
+            clearInterval(intervalo);
+
+            intervalo = setInterval(() => {
+
+                tempoRestante--;
+
+                atualizarContador();
+
+                if (tempoRestante <= 0) {
+
+                    clearInterval(intervalo);
+
+                    proximaPagina();
+                }
+
+            }, 1000);
+        }
+
+
+        function atualizarContador() {
+
+            contador.innerText =
+                paginas[indice].nome +
+                "  •  " +
+                tempoRestante +
+                "s";
+        }
+
+
+        function proximaPagina() {
+
+            indice++;
+
+            if (indice >= paginas.length) {
+                indice = 0;
+            }
+
+            carregarPagina();
+        }
+
+
+        // Inicia
+        carregarPagina();
+
+
+        // Tenta entrar em tela cheia
+        document.addEventListener("click", () => {
+
+            if (document.documentElement.requestFullscreen) {
+
+                document.documentElement
+                    .requestFullscreen()
+                    .catch(() => {});
+
+            }
+
+        });
+
+    </script>
+
+</body>
+</html>
