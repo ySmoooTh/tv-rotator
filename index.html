@@ -1,301 +1,301 @@
 <!DOCTYPE html>
-
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
 
-```
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
-<title>TV Dashboard - Barbi</title>
+    <title>TV Dashboard - Barbi</title>
 
-<style>
+    <style>
 
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    html,
-    body {
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        background: #000;
-    }
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #000;
+        }
 
-    /* Todos os painéis ocupam exatamente a tela */
-    .pagina {
-        position: fixed;
+        .pagina {
+            position: fixed;
 
-        top: 0;
-        left: 0;
+            top: 0;
+            left: 0;
 
-        width: 100%;
-        height: 100%;
+            width: 100%;
+            height: 100%;
 
-        border: none;
+            border: none;
 
-        opacity: 0;
+            opacity: 0;
+            visibility: hidden;
 
-        visibility: hidden;
+            transition: opacity 0.3s ease;
 
-        transition: opacity 0.3s ease;
+            background: #000;
+        }
 
-        background: #000;
-    }
+        .pagina.ativo {
+            opacity: 1;
+            visibility: visible;
+            z-index: 10;
+        }
 
-    /* Painel atualmente exibido */
-    .pagina.ativo {
-        opacity: 1;
-        visibility: visible;
+        #contador {
 
-        z-index: 10;
-    }
+            position: fixed;
 
-    /* Contador */
-    #contador {
+            right: 15px;
+            bottom: 15px;
 
-        position: fixed;
+            background: rgba(0, 0, 0, 0.65);
 
-        right: 15px;
-        bottom: 15px;
+            color: white;
 
-        background: rgba(0, 0, 0, 0.65);
+            padding: 8px 12px;
 
-        color: white;
+            border-radius: 6px;
 
-        padding: 8px 12px;
+            font-family: Arial, sans-serif;
 
-        border-radius: 6px;
+            font-size: 14px;
 
-        font-family: Arial, sans-serif;
+            z-index: 9999;
+        }
 
-        font-size: 14px;
-
-        z-index: 9999;
-    }
-
-</style>
-```
+    </style>
 
 </head>
 
 <body>
 
-```
-<!-- PAINEL 1 -->
-<iframe
-    id="pagina0"
-    class="pagina"
-    src="https://app.powerbi.com"
-    allow="autoplay; fullscreen"
-    allowfullscreen>
-</iframe>
+
+    <!-- =========================================================
+         PAINEL 1 - POWER BI
+         ========================================================= -->
+
+    <iframe
+        id="pagina0"
+        class="pagina"
+
+        src="https://app.powerbi.com/reportEmbed?reportId=fef840a1-6ea7-4d28-bbc1-1c140ae215cf&autoAuth=true"
+
+        allow="autoplay; fullscreen"
+        allowfullscreen>
+    </iframe>
 
 
-<!-- PAINEL 2 -->
-<iframe
-    id="pagina1"
-    class="pagina"
-    src="http://192.168.8.12:8088/barbi_producao/view/mapa_producao.html"
-    allow="autoplay; fullscreen"
-    allowfullscreen>
-</iframe>
+    <!-- =========================================================
+         PAINEL 2 - INDICADORES BARBI
+         ========================================================= -->
+
+    <iframe
+        id="pagina1"
+        class="pagina"
+
+        src="http://192.168.8.12:8088/barbi_producao/view/mapa_producao.html"
+
+        allow="autoplay; fullscreen"
+        allowfullscreen>
+    </iframe>
 
 
-<!-- CONTADOR -->
-<div id="contador">
-    Carregando...
-</div>
+    <!-- =========================================================
+         CONTADOR
+         ========================================================= -->
+
+    <div id="contador">
+        Carregando...
+    </div>
 
 
-<script>
-
-    /*  
-    ============================================================
-    CONFIGURAÇÃO DOS PAINÉIS
-    ============================================================
-    */
-
-    const paginas = [
-
-        {
-            nome: "Power BI",
-            tempo: 20
-        },
-
-        {
-            nome: "Indicadores barbi",
-            tempo: 20
-        }
-
-    ];
-
-
-    /*
-    ============================================================
-    CONTROLE
-    ============================================================
-    */
-
-    let indice = 0;
-
-    let tempoRestante = paginas[0].tempo;
-
-    let intervalo;
-
-
-    const contador =
-        document.getElementById("contador");
-
-
-    /*
-    ============================================================
-    MOSTRAR PAINEL
-    ============================================================
-    */
-
-    function mostrarPagina() {
-
-        /*
-        Esconde todos
-        */
-
-        document
-            .querySelectorAll(".pagina")
-            .forEach(pagina => {
-
-                pagina.classList.remove("ativo");
-
-            });
+    <script>
 
 
         /*
-        Mostra somente o atual
+        ============================================================
+        CONFIGURAÇÃO
+        ============================================================
         */
 
-        const paginaAtual =
-            document.getElementById(
-                "pagina" + indice
-            );
+        const paginas = [
 
+            {
+                nome: "Produção Hidráulica - Power BI",
+                tempo: 20
+            },
 
-        paginaAtual.classList.add("ativo");
+            {
+                nome: "Indicadores Barbi",
+                tempo: 20
+            }
+
+        ];
 
 
         /*
-        Reinicia contador
+        ============================================================
+        CONTROLE
+        ============================================================
         */
 
-        tempoRestante =
-            paginas[indice].tempo;
+        let indice = 0;
+
+        let tempoRestante = paginas[0].tempo;
+
+        let intervalo;
 
 
-        atualizarContador();
+        const contador =
+            document.getElementById("contador");
 
 
         /*
-        Reinicia timer
+        ============================================================
+        MOSTRAR PÁGINA
+        ============================================================
         */
 
-        clearInterval(intervalo);
+        function mostrarPagina() {
+
+            // Esconde todos os painéis
+
+            document
+                .querySelectorAll(".pagina")
+                .forEach(pagina => {
+
+                    pagina.classList.remove("ativo");
+
+                });
 
 
-        intervalo = setInterval(() => {
+            // Mostra o painel atual
 
-            tempoRestante--;
+            const paginaAtual =
+                document.getElementById(
+                    "pagina" + indice
+                );
+
+
+            paginaAtual.classList.add("ativo");
+
+
+            // Reinicia contador
+
+            tempoRestante =
+                paginas[indice].tempo;
+
 
             atualizarContador();
 
 
-            if (tempoRestante <= 0) {
+            // Reinicia timer
 
-                proximaPagina();
+            clearInterval(intervalo);
+
+
+            intervalo = setInterval(() => {
+
+                tempoRestante--;
+
+                atualizarContador();
+
+
+                if (tempoRestante <= 0) {
+
+                    proximaPagina();
+
+                }
+
+            }, 1000);
+
+        }
+
+
+        /*
+        ============================================================
+        CONTADOR
+        ============================================================
+        */
+
+        function atualizarContador() {
+
+            contador.innerText =
+                paginas[indice].nome +
+                "  •  " +
+                tempoRestante +
+                "s";
+
+        }
+
+
+        /*
+        ============================================================
+        PRÓXIMO PAINEL
+        ============================================================
+        */
+
+        function proximaPagina() {
+
+            clearInterval(intervalo);
+
+
+            indice++;
+
+
+            if (indice >= paginas.length) {
+
+                indice = 0;
 
             }
 
-        }, 1000);
 
-    }
-
-
-    /*
-    ============================================================
-    CONTADOR
-    ============================================================
-    */
-
-    function atualizarContador() {
-
-        contador.innerText =
-            paginas[indice].nome +
-            "  •  " +
-            tempoRestante +
-            "s";
-
-    }
-
-
-    /*
-    ============================================================
-    PRÓXIMA PÁGINA
-    ============================================================
-    */
-
-    function proximaPagina() {
-
-        clearInterval(intervalo);
-
-
-        indice++;
-
-
-        if (indice >= paginas.length) {
-
-            indice = 0;
+            mostrarPagina();
 
         }
 
+
+        /*
+        ============================================================
+        INICIAR
+        ============================================================
+        */
 
         mostrarPagina();
 
-    }
+
+        /*
+        ============================================================
+        TELA CHEIA
+        ============================================================
+        */
+
+        document.addEventListener("click", () => {
+
+            if (
+                document.documentElement.requestFullscreen
+            ) {
+
+                document.documentElement
+                    .requestFullscreen()
+                    .catch(() => {});
+
+            }
+
+        });
 
 
-    /*
-    ============================================================
-    INICIA
-    ============================================================
-    */
-
-    mostrarPagina();
-
-
-    /*
-    ============================================================
-    TELA CHEIA
-    ============================================================
-    */
-
-    document.addEventListener("click", () => {
-
-        if (
-            document.documentElement.requestFullscreen
-        ) {
-
-            document.documentElement
-                .requestFullscreen()
-                .catch(() => {});
-
-        }
-
-    });
-
-</script>
-```
+    </script>
 
 </body>
+
 </html>
