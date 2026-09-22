@@ -3,51 +3,53 @@
 
 <head>
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>Teste TV</title>
-
-    <style>
-
-        html,
-        body {
-            margin: 0;
-            padding: 0;
-
-            width: 100%;
-            height: 100%;
-
-            overflow: hidden;
-
-            background: red;
-        }
-
-        iframe {
-
-            position: fixed;
-
-            top: 0;
-            left: 0;
-
-            width: 100%;
-            height: 100%;
-
-            border: none;
-
-            background: white;
-        }
-
-    </style>
-
+    <title>Teste iFractal</title>
 </head>
 
 <body>
 
+    <h1>Teste</h1>
+
     <iframe
-        src="http://192.168.8.12:8088/barbi_producao/view/mapa_producao.html">
+        id="teste"
+        src="http://192.168.8.12:8088/barbi_producao/view/mapa_producao.html"
+        style="
+            position:fixed;
+            top:50px;
+            left:0;
+            width:100%;
+            height:calc(100% - 50px);
+            border:0;
+        ">
     </iframe>
+
+    <script>
+
+        const iframe = document.getElementById("teste");
+
+        iframe.onload = function () {
+
+            console.log("IFRAME CARREGOU");
+
+            try {
+
+                console.log(
+                    "URL:",
+                    iframe.contentWindow.location.href
+                );
+
+            } catch (erro) {
+
+                console.log(
+                    "Cross-origin:",
+                    erro
+                );
+
+            }
+
+        };
+
+    </script>
 
 </body>
 
