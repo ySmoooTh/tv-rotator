@@ -1,383 +1,150 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>TV Dashboard - Barbi</title>
+    <title>TV - Barbi</title>
 
     <style>
-
-        * {
+        html, body {
             margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html,
-        body {
             width: 100%;
             height: 100%;
-            overflow: hidden;
             background: #000;
-        }
-
-
-        /*
-        ============================================================
-        PAINÉIS
-        ============================================================
-        */
-
-        .pagina {
-
-            position: fixed;
-
-            top: 0;
-            left: 0;
-
-            width: 100vw;
-
-            /*
-            Força o conteúdo do iframe a ter
-            uma largura mínima maior que 768px.
-            */
-
-            min-width: 1000px;
-
-            height: 100vh;
-
-            border: none;
-
-            opacity: 0;
-
-            visibility: hidden;
-
-            background: #000;
-
-            transition: opacity 0.3s ease;
-
-            z-index: 1;
-        }
-
-
-        /*
-        ============================================================
-        PAINEL ATIVO
-        ============================================================
-        */
-
-        .pagina.ativo {
-
-            opacity: 1;
-
-            visibility: visible;
-
-            z-index: 10;
-        }
-
-
-        /*
-        ============================================================
-        CONTADOR
-        ============================================================
-        */
-
-        #contador {
-
-            position: fixed;
-
-            right: 15px;
-            bottom: 15px;
-
-            background: rgba(0, 0, 0, 0.65);
-
-            color: white;
-
-            padding: 8px 12px;
-
-            border-radius: 6px;
-
+            color: #fff;
             font-family: Arial, sans-serif;
-
-            font-size: 14px;
-
-            z-index: 9999;
         }
 
+        .controle {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        button {
+            font-size: 28px;
+            padding: 20px 50px;
+            cursor: pointer;
+        }
+
+        #status {
+            font-size: 22px;
+        }
     </style>
-
 </head>
-
 
 <body>
 
+<div class="controle">
 
-    <!-- =========================================================
-         PAINEL 1
-         INDICADORES BARBI
-         ========================================================= -->
+    <button onclick="iniciar()">INICIAR TV</button>
 
-    <iframe
-
-        id="pagina0"
-
-        class="pagina"
-
-        src="http://192.168.8.12:8088/barbi_producao/view/mapa_producao.html"
-
-        allow="autoplay; fullscreen"
-
-        allowfullscreen>
-
-    </iframe>
-
-
-    <!-- =========================================================
-         PAINEL 2
-         POWER BI
-         ========================================================= -->
-
-    <iframe
-
-        id="pagina1"
-
-        class="pagina"
-
-        src="https://app.powerbi.com/reportEmbed?reportId=fef840a1-6ea7-4d28-bbc1-1c140ae215cf&autoAuth=true"
-
-        allow="autoplay; fullscreen"
-
-        allowfullscreen>
-
-    </iframe>
-
-
-    <!-- =========================================================
-         CONTADOR
-         ========================================================= -->
-
-    <div id="contador">
-        Carregando...
+    <div id="status">
+        Aguardando...
     </div>
 
+</div>
 
-    <script>
+<script>
 
+const paginas = [
 
-        /*
-        ============================================================
-        CONFIGURAÇÃO DOS PAINÉIS
-        ============================================================
-        */
+    "http://192.168.8.12:8088/barbi_producao/view/mapa_producao.html",
 
-        const paginas = [
+    "https://app.powerbi.com/reportEmbed?reportId=fef840a1-6ea7-4d28-bbc1-1c140ae215cf&autoAuth=true"
 
-            {
-                nome: "Indicadores Barbi",
+];
 
-                tempo: 20
-            },
+let janela = null;
+let indice = 0;
+let timer = null;
 
-            {
-                nome: "Produção Hidráulica - Power BI",
-
-                tempo: 20
-            }
-
-        ];
+const TEMPO = 20000; // 20 segundos
 
 
-        /*
-        ============================================================
-        VARIÁVEIS
-        ============================================================
-        */
+function iniciar() {
 
-        let indice = 0;
+    // Abre uma nova janela/aba.
+    // Como isso acontece após o clique,
+    // o navegador tende a permitir o popup.
+    janela = window.open(
+        "about:blank",
+        "TV_BARBI"
+    );
 
-        let tempoRestante =
-            paginas[0].tempo;
+    if (!janela) {
 
-        let intervalo;
+        document.getElementById("status").innerHTML =
+            "POPUP BLOQUEADO. Permita pop-ups para este site.";
 
+        return;
+    }
 
-        const contador =
-            document.getElementById("contador");
+    // Primeira página
+    indice = 0;
 
+    abrirPagina();
 
-        /*
-        ============================================================
-        MOSTRAR PAINEL
-        ============================================================
-        */
+    // Começa a alternância
+    timer = setInterval(() => {
 
-        function mostrarPagina() {
+        indice++;
 
-
-            /*
-            Esconde todos os painéis
-            */
-
-            document
-                .querySelectorAll(".pagina")
-                .forEach(pagina => {
-
-                    pagina.classList.remove("ativo");
-
-                });
-
-
-            /*
-            Obtém o painel atual
-            */
-
-            const paginaAtual =
-                document.getElementById(
-                    "pagina" + indice
-                );
-
-
-            /*
-            Mostra o painel
-            */
-
-            if (paginaAtual) {
-
-                paginaAtual.classList.add("ativo");
-
-            }
-
-
-            /*
-            Reinicia contador
-            */
-
-            tempoRestante =
-                paginas[indice].tempo;
-
-
-            atualizarContador();
-
-
-            /*
-            Reinicia intervalo
-            */
-
-            clearInterval(intervalo);
-
-
-            intervalo = setInterval(() => {
-
-
-                tempoRestante--;
-
-
-                atualizarContador();
-
-
-                if (tempoRestante <= 0) {
-
-                    proximaPagina();
-
-                }
-
-
-            }, 1000);
-
+        if (indice >= paginas.length) {
+            indice = 0;
         }
 
+        abrirPagina();
 
-        /*
-        ============================================================
-        CONTADOR
-        ============================================================
-        */
+    }, TEMPO);
 
-        function atualizarContador() {
-
-            contador.innerText =
-
-                paginas[indice].nome +
-
-                "  •  " +
-
-                tempoRestante +
-
-                "s";
-
-        }
+}
 
 
-        /*
-        ============================================================
-        PRÓXIMO PAINEL
-        ============================================================
-        */
+function abrirPagina() {
 
-        function proximaPagina() {
+    if (!janela || janela.closed) {
 
+        clearInterval(timer);
 
-            clearInterval(intervalo);
+        document.getElementById("status").innerHTML =
+            "A janela da TV foi fechada.";
 
+        return;
+    }
 
-            indice++;
+    janela.location.href = paginas[indice];
 
+    // Tenta colocar a janela em primeiro plano
+    setTimeout(() => {
 
-            if (
-                indice >= paginas.length
-            ) {
+        try {
+            janela.focus();
+        } catch (e) {}
 
-                indice = 0;
-
-            }
-
-
-            mostrarPagina();
-
-        }
+    }, 500);
 
 
-        /*
-        ============================================================
-        INICIALIZAÇÃO
-        ============================================================
-        */
+    if (indice === 0) {
 
-        mostrarPagina();
+        document.getElementById("status").innerHTML =
+            "CDI Indicadores — próxima troca em 20 segundos";
 
+    } else {
 
-        /*
-        ============================================================
-        TELA CHEIA
-        ============================================================
-        */
+        document.getElementById("status").innerHTML =
+            "Power BI — próxima troca em 20 segundos";
 
-        document.addEventListener(
-            "click",
-            () => {
+    }
 
-                if (
-                    document.documentElement
-                        .requestFullscreen
-                ) {
+}
 
-                    document.documentElement
-                        .requestFullscreen()
-                        .catch(() => {});
-
-                }
-
-            }
-        );
-
-
-    </script>
-
+</script>
 
 </body>
-
 </html>
