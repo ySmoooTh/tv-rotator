@@ -1,302 +1,30 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-
+<html>
 <head>
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>TV Dashboard - Barbi</title>
-
     <style>
-
-        * {
+        html, body {
             margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html,
-        body {
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background: #000;
+            background: red;
         }
 
-        .pagina {
-            position: fixed;
-
-            top: 0;
-            left: 0;
-
+        iframe {
             width: 100%;
             height: 100%;
-
             border: none;
-
-            opacity: 0;
-            visibility: hidden;
-
-            transition: opacity 0.3s ease;
-
-            background: #000;
         }
-
-        .pagina.ativo {
-            opacity: 1;
-            visibility: visible;
-            z-index: 10;
-        }
-
-        #contador {
-
-            position: fixed;
-
-            right: 15px;
-            bottom: 15px;
-
-            background: rgba(0, 0, 0, 0.65);
-
-            color: white;
-
-            padding: 8px 12px;
-
-            border-radius: 6px;
-
-            font-family: Arial, sans-serif;
-
-            font-size: 14px;
-
-            z-index: 9999;
-        }
-
     </style>
-
 </head>
 
 <body>
 
-
-    <!-- =========================================================
-         PAINEL 1 - POWER BI
-         ========================================================= -->
-
     <iframe
-        id="pagina0"
-        class="pagina"
-
-        src="https://192.168.8.12:8088/barbi_producao/view/mapa_producao.html"
-
-        allow="autoplay; fullscreen"
-        allowfullscreen>
+        src="http://192.168.8.12:8088/barbi_producao/view/mapa_producao.html">
     </iframe>
-
-
-    <!-- =========================================================
-         PAINEL 2 - INDICADORES BARBI
-         ========================================================= -->
-
-    <iframe
-        id="pagina1"
-        class="pagina"
-
-        src="https://app.powerbi.com/reportEmbed?reportId=fef840a1-6ea7-4d28-bbc1-1c140ae215cf&autoAuth=true"
-
-        allow="autoplay; fullscreen"
-        allowfullscreen>
-    </iframe>
-
-
-    <!-- =========================================================
-         CONTADOR
-         ========================================================= -->
-
-    <div id="contador">
-        Carregando...
-    </div>
-
-
-    <script>
-
-
-        /*
-        ============================================================
-        CONFIGURAÇÃO
-        ============================================================
-        */
-
-        const paginas = [
-
-            {
-                nome: "Indicadores Barbi",
-                tempo: 120
-
-            },
-
-            {
-                nome: "Produção Hidráulica - Power BI",
-                tempo: 120
-            }
-
-        ];
-
-
-        /*
-        ============================================================
-        CONTROLE
-        ============================================================
-        */
-
-        let indice = 0;
-
-        let tempoRestante = paginas[0].tempo;
-
-        let intervalo;
-
-
-        const contador =
-            document.getElementById("contador");
-
-
-        /*
-        ============================================================
-        MOSTRAR PÁGINA
-        ============================================================
-        */
-
-        function mostrarPagina() {
-
-            // Esconde todos os painéis
-
-            document
-                .querySelectorAll(".pagina")
-                .forEach(pagina => {
-
-                    pagina.classList.remove("ativo");
-
-                });
-
-
-            // Mostra o painel atual
-
-            const paginaAtual =
-                document.getElementById(
-                    "pagina" + indice
-                );
-
-
-            paginaAtual.classList.add("ativo");
-
-
-            // Reinicia contador
-
-            tempoRestante =
-                paginas[indice].tempo;
-
-
-            atualizarContador();
-
-
-            // Reinicia timer
-
-            clearInterval(intervalo);
-
-
-            intervalo = setInterval(() => {
-
-                tempoRestante--;
-
-                atualizarContador();
-
-
-                if (tempoRestante <= 0) {
-
-                    proximaPagina();
-
-                }
-
-            }, 1000);
-
-        }
-
-
-        /*
-        ============================================================
-        CONTADOR
-        ============================================================
-        */
-
-        function atualizarContador() {
-
-            contador.innerText =
-                paginas[indice].nome +
-                "  •  " +
-                tempoRestante +
-                "s";
-
-        }
-
-
-        /*
-        ============================================================
-        PRÓXIMO PAINEL
-        ============================================================
-        */
-
-        function proximaPagina() {
-
-            clearInterval(intervalo);
-
-
-            indice++;
-
-
-            if (indice >= paginas.length) {
-
-                indice = 0;
-
-            }
-
-
-            mostrarPagina();
-
-        }
-
-
-        /*
-        ============================================================
-        INICIAR
-        ============================================================
-        */
-
-        mostrarPagina();
-
-
-        /*
-        ============================================================
-        TELA CHEIA
-        ============================================================
-        */
-
-        document.addEventListener("click", () => {
-
-            if (
-                document.documentElement.requestFullscreen
-            ) {
-
-                document.documentElement
-                    .requestFullscreen()
-                    .catch(() => {});
-
-            }
-
-        });
-
-
-    </script>
 
 </body>
-
 </html>
